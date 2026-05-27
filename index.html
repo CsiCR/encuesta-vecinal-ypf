@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Encuesta Vecinal – Unión Vecinal Barrio YPF</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #1588e6;
+    --blue-dark: #0e6bbf;
+    --blue-light: #e8f3fd;
+    --blue-muted: #b8d9f8;
+    --bg: #FAFAF5;
+    --gray: #5A5A5A;
+    --gray-light: #ebebeb;
+    --gray-muted: #8a8a8a;
+    --white: #ffffff;
+    --text: #1a1a1a;
+    --error: #d63031;
+    --success: #00b894;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 20px rgba(21,136,230,0.10);
+    --shadow-card: 0 4px 32px rgba(21,136,230,0.13);
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--blue);
+    padding: 2.2rem 1.25rem 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 100px;
+    margin-bottom: 1rem;
+  }
+  .header-badge svg { width: 13px; height: 13px; }
+  .header h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(1.3rem, 5.5vw, 1.65rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .header-org {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    background: var(--blue);
+    padding: 0 1.25rem 1.4rem;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .progress-track {
+    height: 5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 100px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: #fff;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* WELCOME CARD */
+  .welcome-card {
+    margin: -1.2rem 1rem 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.25rem 1.2rem;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+  }
+  .welcome-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    background: var(--blue-light);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .welcome-icon svg { width: 22px; height: 22px; color: var(--blue); }
+  .welcome-text p {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--gray);
+  }
+  .welcome-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  /* FORM CONTAINER */
+  .form-container {
+    padding: 1.5rem 1rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* STEP CARD */
+  .step-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .step-card:focus-within {
+    border-color: var(--blue-muted);
+    box-shadow: 0 4px 24px rgba(21,136,230,0.14);
+  }
+  .step-card.hidden { display: none; }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-label {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    padding-top: 3px;
+  }
+  .step-label .required {
+    color: var(--blue);
+    margin-left: 2px;
+  }
+  .step-sublabel {
+    font-size: 12px;
+    color: var(--gray-muted);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+  .step-icon {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-icon svg { width: 18px; height: 18px; color: var(--blue); }
+
+  /* INPUTS */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  textarea:focus {
+    border-color: var(--blue);
+    background: #fff;
+  }
+  input.error, textarea.error {
+    border-color: var(--error);
+  }
+  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+  /* RADIO & CHECKBOX */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .options-grid.single-col { grid-template-columns: 1fr; }
+  .options-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+
+  .option-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 13px;
+    background: var(--bg);
+    border: 1.5px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .option-item:active { background: var(--blue-light); }
+  .option-item input[type="radio"],
+  .option-item input[type="checkbox"] {
+    display: none;
+  }
+  .option-dot {
+    width: 18px; height: 18px;
+    border: 2px solid var(--gray-light);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .option-dot.square { border-radius: 5px; }
+  .option-dot-inner {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.18s;
+  }
+  .option-dot.square .option-dot-inner { border-radius: 2px; }
+
+  .option-item.selected {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+  .option-item.selected .option-dot {
+    border-color: var(--blue);
+    background: var(--blue);
+  }
+  .option-item.selected .option-dot-inner {
+    background: #fff;
+  }
+  .option-text {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.35;
+  }
+  .option-item.selected .option-text { color: var(--blue-dark); }
+
+  /* SECTION DIVIDER */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin: 1.5rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--blue-muted);
+    opacity: 0.5;
+  }
+
+  /* SUBMIT BUTTON */
+  .submit-wrap {
+    padding: 0.5rem 1rem 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-submit:active { background: var(--blue-dark); transform: scale(0.98); }
+  .btn-submit svg { width: 18px; height: 18px; }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 5px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* THANK YOU SCREEN */
+  #thankyou {
+    display: none;
+    min-height: 100vh;
+    background: var(--bg);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  #thankyou.visible { display: flex; }
+  .thankyou-icon {
+    width: 80px; height: 80px;
+    background: var(--blue-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+  .thankyou-icon svg { width: 40px; height: 40px; color: var(--blue); }
+  #thankyou h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+  #thankyou p {
+    font-size: 15px;
+    color: var(--gray);
+    line-height: 1.7;
+    max-width: 340px;
+    margin: 0 auto 2rem;
+  }
+  .thankyou-dots {
+    display: flex; gap: 10px; justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .thankyou-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--blue-light);
+  }
+  .thankyou-dots span:nth-child(2) { background: var(--blue); }
+  .btn-nueva {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 24px;
+    background: var(--white);
+    color: var(--blue);
+    border: 1.5px solid var(--blue-muted);
+    border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-nueva:active { background: var(--blue-light); }
+
+  /* FOOTER STAMP */
+  .footer-stamp {
+    padding: 0 1rem 2.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .footer-stamp p {
+    font-size: 11.5px;
+    color: var(--gray-muted);
+    line-height: 1.6;
+  }
+  .footer-stamp strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 380px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .options-grid.three-col { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MAIN FORM -->
+<div id="mainForm">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Barrio YPF · Pico Truncado
+    </div>
+    <h1>Encuesta Vecinal</h1>
+    <h1 style="font-style:italic; font-weight:400; font-size:clamp(1rem,4.5vw,1.3rem); margin-top:4px;">Construyamos juntos el futuro de la Unión Vecinal</h1>
+    <p class="header-org">Unión Vecinal Barrio YPF · Santa Cruz, Argentina</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">Completá el formulario</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <!-- WELCOME CARD -->
+  <div class="welcome-card">
+    <div class="welcome-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div class="welcome-text">
+      <strong>¡Bienvenido/a, vecino/a!</strong>
+      <p>La Unión Vecinal Barrio YPF está transformándose en un <strong>Centro Educativo Comunitario</strong>. Queremos conocer tus intereses y propuestas para diseñar actividades que generen oportunidades de aprendizaje y desarrollo para todos. <em>Tu opinión es muy importante.</em></p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <form id="vecinalForm" novalidate>
+    <div class="form-container">
+
+      <p class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0116 0v2"/></svg>
+        Datos personales
+      </p>
+
+      <!-- 1. Nombre -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-label">Nombre y apellido <span class="required">*</span></div>
+            <div class="step-sublabel">Requerido</div>
+          </div>
+        </div>
+        <input type="text" id="nombre" placeholder="Ej: María González" autocomplete="name">
+        <div class="error-msg" id="err-nombre">Por favor ingresá tu nombre y apellido.</div>
+      </div>
+
+      <!-- 2. Edad -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-label">¿Cuál es tu rango de edad?</div>
+          </div>
+        </div>
+        <div class="options-grid single-col" id="opts-edad">
+          <label class="option-item"><input type="radio" name="edad" value="menor18"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">Menor de 18 años</span></label>
+          <label class="option-item"><input type="radio" name="edad" value="18-30"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">18 a 30 años</span></label>
+          <label class="option-item"><input type="radio" name="edad" value="31-50"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">31 a 50 años</span></label>
+          <label class="option-item"><input type="radio" name="edad" value="mas50"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">Más de 50 años</span></label>
+        </div>
+      </div>
+
+      <!-- 3. Barrio -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div><div class="step-label">Barrio donde vivís</div></div>
+        </div>
+        <input type="text" id="barrio" placeholder="Ej: Barrio YPF, Centro...">
+      </div>
+
+      <p class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        Intereses y actividades
+      </p>
+
+      <!-- 4. Actividades -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-label">¿Qué actividades te interesaría encontrar?</div>
+            <div class="step-sublabel">Podés elegir varias opciones</div>
+          </div>
+        </div>
+        <div class="options-grid" id="opts-actividades">
+          <label class="option-item"><input type="checkbox" name="actividades" value="computacion"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">💻 Computación</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="diseno"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🎨 Diseño gráfico</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="marketing"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">📱 Marketing digital</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="programacion"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">⌨️ Programación</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="ingles"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🌎 Inglés</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="electricidad"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">⚡ Electricidad</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="herreria"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🔧 Herrería</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="costura"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🧵 Costura</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="panaderia"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🍞 Panadería</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="emprendedurismo"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🚀 Emprendedurismo</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="apoyo"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">📚 Apoyo escolar</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="cultural"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🎭 Act. culturales</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="charlas"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🎤 Charlas y caps.</span></label>
+          <label class="option-item"><input type="checkbox" name="actividades" value="robotica"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🤖 Robótica</span></label>
+          <label class="option-item" style="grid-column:1/-1"><input type="checkbox" name="actividades" value="otra" id="chk-otra-act"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">✏️ Otra actividad (especificar)</span></label>
+        </div>
+      </div>
+
+      <!-- 5. Otra actividad (condicional) -->
+      <div class="step-card hidden" id="card-otra-act">
+        <div class="step-header">
+          <div class="step-num">5</div>
+          <div><div class="step-label">¿Cuál otra actividad te interesa?</div></div>
+        </div>
+        <input type="text" id="otra-act" placeholder="Describí la actividad que te gustaría...">
+      </div>
+
+      <!-- 6. Horario -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num" id="num-horario">6</div>
+          <div>
+            <div class="step-label">¿En qué horario preferís participar?</div>
+            <div class="step-sublabel">Podés elegir más de uno</div>
+          </div>
+        </div>
+        <div class="options-grid three-col" id="opts-horario">
+          <label class="option-item"><input type="checkbox" name="horario" value="manana"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🌅 Mañana</span></label>
+          <label class="option-item"><input type="checkbox" name="horario" value="tarde"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">☀️ Tarde</span></label>
+          <label class="option-item"><input type="checkbox" name="horario" value="noche"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🌙 Noche</span></label>
+        </div>
+      </div>
+
+      <p class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Participación y colaboración
+      </p>
+
+      <!-- 7. Colaborar -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num" id="num-colaborar">7</div>
+          <div><div class="step-label">¿Te gustaría colaborar con la Unión Vecinal?</div></div>
+        </div>
+        <div class="options-grid single-col" id="opts-colaborar">
+          <label class="option-item"><input type="radio" name="colaborar" value="si"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">✅ Sí, me gustaría colaborar</span></label>
+          <label class="option-item"><input type="radio" name="colaborar" value="talvez"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">🤔 Tal vez, necesito más info</span></label>
+          <label class="option-item"><input type="radio" name="colaborar" value="no"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">❌ No por ahora</span></label>
+        </div>
+      </div>
+
+      <!-- 8. Forma de colaborar (condicional) -->
+      <div class="step-card hidden" id="card-forma-colab">
+        <div class="step-header">
+          <div class="step-num" id="num-forma-colab">8</div>
+          <div>
+            <div class="step-label">¿De qué forma te gustaría colaborar?</div>
+            <div class="step-sublabel">Podés elegir varias opciones</div>
+          </div>
+        </div>
+        <div class="options-grid single-col" id="opts-formas">
+          <label class="option-item"><input type="checkbox" name="formas" value="talleres"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🎓 Dictando talleres o clases</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="organizando"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">📋 Organizando actividades</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="mantenimiento"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🔨 Mantenimiento y mejoras edilicias</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="redes"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">📲 Difusión en redes sociales</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="eventos"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">🎉 Apoyo a eventos</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="gestion"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">📊 Gestión de proyectos</span></label>
+          <label class="option-item"><input type="checkbox" name="formas" value="otra-colab"><span class="option-dot square"><span class="option-dot-inner"></span></span><span class="option-text">➕ Otra forma de colaboración</span></label>
+        </div>
+      </div>
+
+      <p class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Tu voz, tu barrio
+      </p>
+
+      <!-- 9. Comentarios -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num" id="num-comentarios">9</div>
+          <div>
+            <div class="step-label">Comentarios, propuestas o sugerencias</div>
+            <div class="step-sublabel">Opcional – para mejorar el barrio o la Unión Vecinal</div>
+          </div>
+        </div>
+        <textarea id="comentarios" placeholder="Escribí tus ideas, propuestas o sugerencias para el Centro Educativo Comunitario..."></textarea>
+      </div>
+
+      <p class="section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Contacto (opcional)
+      </p>
+
+      <!-- 10. Recibir info -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num" id="num-info">10</div>
+          <div><div class="step-label">¿Querés recibir info sobre cursos y actividades?</div></div>
+        </div>
+        <div class="options-grid single-col" id="opts-info">
+          <label class="option-item"><input type="radio" name="recibirinfo" value="si"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">✅ Sí, quiero estar al tanto</span></label>
+          <label class="option-item"><input type="radio" name="recibirinfo" value="no"><span class="option-dot"><span class="option-dot-inner"></span></span><span class="option-text">❌ No, gracias</span></label>
+        </div>
+      </div>
+
+      <!-- 11. WhatsApp (condicional) -->
+      <div class="step-card hidden" id="card-wapp">
+        <div class="step-header">
+          <div class="step-num" id="num-wapp">11</div>
+          <div>
+            <div class="step-label">Número de WhatsApp</div>
+            <div class="step-sublabel">Sin código de área, ej: 2974 123456</div>
+          </div>
+        </div>
+        <input type="tel" id="whatsapp" placeholder="Ej: 2974 123456" autocomplete="tel">
+      </div>
+
+      <!-- 12. Email -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-num" id="num-email">12</div>
+          <div>
+            <div class="step-label">Correo electrónico</div>
+            <div class="step-sublabel">Opcional</div>
+          </div>
+        </div>
+        <input type="email" id="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+        <div class="error-msg" id="err-email">Ingresá un correo electrónico válido.</div>
+      </div>
+
+    </div><!-- /form-container -->
+
+    <div class="submit-wrap">
+      <div class="error-msg show" id="err-general" style="display:none; margin-bottom:12px; text-align:center; font-size:13px;"></div>
+      <button type="submit" class="btn-submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Enviar encuesta
+      </button>
+    </div>
+
+    <div class="footer-stamp">
+      <p>🔒 Tus datos son confidenciales y serán utilizados únicamente para planificar actividades de la <strong>Unión Vecinal Barrio YPF</strong>. Pico Truncado, Santa Cruz.</p>
+    </div>
+
+  </form>
+</div>
+
+<!-- THANK YOU -->
+<div id="thankyou">
+  <div class="thankyou-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  </div>
+  <div class="thankyou-dots"><span></span><span></span><span></span></div>
+  <h2>¡Muchas gracias por participar!</h2>
+  <p>Tu opinión nos ayuda a construir un espacio educativo, cultural y comunitario para todos los vecinos del Barrio YPF.</p>
+  <p style="font-size:13px; color:#aaa; margin-bottom:1.5rem;">Unión Vecinal Barrio YPF · Pico Truncado, Santa Cruz 🏘️</p>
+  <button class="btn-nueva" onclick="resetForm()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+    Completar otra encuesta
+  </button>
+</div>
+
+<script>
+  // --- PROGRESS ---
+  function updateProgress() {
+    const total = 8;
+    let filled = 0;
+    if (document.getElementById('nombre').value.trim()) filled++;
+    if (document.querySelector('input[name="edad"]:checked')) filled++;
+    if (document.getElementById('barrio').value.trim()) filled++;
+    if (document.querySelectorAll('input[name="actividades"]:checked').length > 0) filled++;
+    if (document.querySelectorAll('input[name="horario"]:checked').length > 0) filled++;
+    if (document.querySelector('input[name="colaborar"]:checked')) filled++;
+    if (document.querySelector('input[name="recibirinfo"]:checked')) filled++;
+    if (document.getElementById('comentarios').value.trim()) filled++;
+    const pct = Math.round((filled / total) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    document.getElementById('progress-label').textContent = pct === 100 ? '¡Listo para enviar!' : pct > 50 ? 'Casi terminás...' : 'Completá el formulario';
+  }
+
+  // --- OPTION SELECTION (radio) ---
+  document.querySelectorAll('.options-grid').forEach(grid => {
+    grid.querySelectorAll('.option-item').forEach(item => {
+      const input = item.querySelector('input');
+      item.addEventListener('click', function() {
+        if (input.type === 'radio') {
+          const groupName = input.name;
+          document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+            r.closest('.option-item').classList.remove('selected');
+          });
+          item.classList.add('selected');
+          input.checked = true;
+          handleConditionals();
+        } else {
+          item.classList.toggle('selected');
+          input.checked = !item.classList.contains('selected') ? false : true;
+          // Re-sync
+          if (item.classList.contains('selected')) input.checked = true;
+          else input.checked = false;
+          handleConditionals();
+        }
+        updateProgress();
+      });
+    });
+  });
+
+  // Re-check on any input
+  document.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener('input', updateProgress);
+  });
+
+  // --- CONDITIONALS ---
+  function handleConditionals() {
+    // Otra actividad
+    const otraAct = document.getElementById('chk-otra-act').checked;
+    document.getElementById('card-otra-act').classList.toggle('hidden', !otraAct);
+
+    // Colaborar => mostrar formas
+    const colab = document.querySelector('input[name="colaborar"]:checked');
+    const showFormas = colab && (colab.value === 'si' || colab.value === 'talvez');
+    document.getElementById('card-forma-colab').classList.toggle('hidden', !showFormas);
+
+    // Recibir info => mostrar whatsapp
+    const info = document.querySelector('input[name="recibirinfo"]:checked');
+    const showWapp = info && info.value === 'si';
+    document.getElementById('card-wapp').classList.toggle('hidden', !showWapp);
+  }
+
+  // --- VALIDATION ---
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // --- SUBMIT ---
+  document.getElementById('vecinalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let valid = true;
+
+    // Nombre
+    const nombre = document.getElementById('nombre').value.trim();
+    if (!nombre) {
+      document.getElementById('nombre').classList.add('error');
+      document.getElementById('err-nombre').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('nombre').classList.remove('error');
+      document.getElementById('err-nombre').classList.remove('show');
+    }
+
+    // Email (si tiene algo)
+    const email = document.getElementById('email').value.trim();
+    if (email && !validateEmail(email)) {
+      document.getElementById('email').classList.add('error');
+      document.getElementById('err-email').classList.add('show');
+      valid = false;
+    } else {
+      document.getElementById('email').classList.remove('error');
+      document.getElementById('err-email').classList.remove('show');
+    }
+
+    if (!valid) {
+      document.getElementById('err-general').style.display = 'block';
+      document.getElementById('err-general').textContent = 'Por favor completá los campos obligatorios.';
+      return;
+    }
+
+    // SUCCESS
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('thankyou').classList.add('visible');
+    window.scrollTo(0, 0);
+  });
+
+  function resetForm() {
+    document.getElementById('vecinalForm').reset();
+    document.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
+    document.querySelectorAll('.step-card').forEach(c => {
+      if (c.id === 'card-otra-act' || c.id === 'card-forma-colab' || c.id === 'card-wapp') {
+        c.classList.add('hidden');
+      }
+    });
+    document.getElementById('mainForm').style.display = 'block';
+    document.getElementById('thankyou').classList.remove('visible');
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progress-pct').textContent = '0%';
+    document.getElementById('progress-label').textContent = 'Completá el formulario';
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>
