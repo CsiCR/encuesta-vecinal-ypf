@@ -730,29 +730,24 @@
     document.getElementById('progress-label').textContent = pct === 100 ? '¡Listo para enviar!' : pct > 50 ? 'Casi terminás...' : 'Completá el formulario';
   }
 
-  // --- OPTION SELECTION (radio) ---
-  document.querySelectorAll('.options-grid').forEach(grid => {
-    grid.querySelectorAll('.option-item').forEach(item => {
-      const input = item.querySelector('input');
-      item.addEventListener('click', function() {
-        if (input.type === 'radio') {
-          const groupName = input.name;
-          document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
-            r.closest('.option-item').classList.remove('selected');
-          });
-          item.classList.add('selected');
-          input.checked = true;
-          handleConditionals();
-        } else {
-          item.classList.toggle('selected');
-          input.checked = !item.classList.contains('selected') ? false : true;
-          // Re-sync
-          if (item.classList.contains('selected')) input.checked = true;
-          else input.checked = false;
-          handleConditionals();
-        }
-        updateProgress();
-      });
+  // --- OPTION SELECTION ---
+  // Let the browser handle input.checked natively, then sync the visual class
+  document.querySelectorAll('.option-item').forEach(item => {
+    const input = item.querySelector('input');
+    if (!input) return;
+    input.addEventListener('change', function() {
+      if (input.type === 'radio') {
+        // Deselect all siblings in the same group
+        document.querySelectorAll(`input[name="${input.name}"]`).forEach(r => {
+          r.closest('.option-item').classList.remove('selected');
+        });
+        item.classList.add('selected');
+      } else {
+        // checkbox: mirror checked state
+        item.classList.toggle('selected', input.checked);
+      }
+      handleConditionals();
+      updateProgress();
     });
   });
 
