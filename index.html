@@ -773,17 +773,13 @@
     document.getElementById('card-wapp').classList.toggle('hidden', !showWapp);
   }
 
-  // --- VALIDATION ---
-  function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzehFTyeZlFVjw6QO_eYyUmUhp7nKsnXYGXaxdWnj5ZhIcqmvprIugTt2p31TKqTMSa/exec';
 
   // --- SUBMIT ---
-  document.getElementById('vecinalForm').addEventListener('submit', function(e) {
+  document.getElementById('vecinalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     let valid = true;
 
-    // Nombre
     const nombre = document.getElementById('nombre').value.trim();
     if (!nombre) {
       document.getElementById('nombre').classList.add('error');
@@ -794,9 +790,8 @@
       document.getElementById('err-nombre').classList.remove('show');
     }
 
-    // Email (si tiene algo)
     const email = document.getElementById('email').value.trim();
-    if (email && !validateEmail(email)) {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       document.getElementById('email').classList.add('error');
       document.getElementById('err-email').classList.add('show');
       valid = false;
@@ -811,7 +806,44 @@
       return;
     }
 
-    // SUCCESS
+    // Recolectar datos
+    const actividades = [...document.querySelectorAll('input[name="actividades"]:checked')].map(i => i.value).join(', ');
+    const horario     = [...document.querySelectorAll('input[name="horario"]:checked')].map(i => i.value).join(', ');
+    const formasColab = [...document.querySelectorAll('input[name="formas"]:checked')].map(i => i.value).join(', ');
+    const colaborar   = document.querySelector('input[name="colaborar"]:checked');
+    const recibirInfo = document.querySelector('input[name="recibirinfo"]:checked');
+
+    const payload = {
+      nombre:        nombre,
+      edad:          document.querySelector('input[name="edad"]:checked')?.value || '',
+      barrio:        document.getElementById('barrio').value.trim(),
+      actividades:   actividades,
+      otraActividad: document.getElementById('otra-act').value.trim(),
+      horario:       horario,
+      colaborar:     colaborar?.value || '',
+      formasColab:   formasColab,
+      comentarios:   document.getElementById('comentarios').value.trim(),
+      recibirInfo:   recibirInfo?.value || '',
+      whatsapp:      document.getElementById('whatsapp').value.trim(),
+      email:         email
+    };
+
+    // Deshabilitar botón mientras envía
+    const btn = document.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = '⏳ Enviando...';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+      });
+    } catch(err) {
+      console.error('Error al enviar:', err);
+    }
+
+    // Mostrar pantalla de gracias
     document.getElementById('mainForm').style.display = 'none';
     document.getElementById('thankyou').classList.add('visible');
     window.scrollTo(0, 0);
@@ -835,3 +867,4 @@
 </script>
 </body>
 </html>
+
